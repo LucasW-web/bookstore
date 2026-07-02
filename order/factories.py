@@ -19,6 +19,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Order
 
+
     @factory.post_generation
     def product(self, create, extracted, **kwargs):
         if not create:
