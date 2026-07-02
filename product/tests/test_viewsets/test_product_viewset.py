@@ -41,8 +41,7 @@ class TestProductViewSet(APITestCase):
                          [0]["active"], self.product.active)
 
     def test_create_product(self):
-        token = Token.objects.get(user__username=self.user.username)
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
+        self.client.force_authenticate(user=self.user)
         category = CategoryFactory()
         data = json.dumps(
             {"title": "notebook", "price": 800.00,
