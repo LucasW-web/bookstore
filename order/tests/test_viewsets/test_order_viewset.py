@@ -15,13 +15,20 @@ class TestOrderViewSet(APITestCase):
     client = APIClient()
 
     def setUp(self):
+        from rest_framework.authtoken.models import Token
+        from order.factories import UserFactory # Garanta que a importação existe
+
         self.category = CategoryFactory(title="technology")
         self.product = ProductFactory(
             title="mouse", price=100, category=[self.category]
         )
-        self.order = OrderFactory(product=[self.product])
-        from rest_framework.authtoken.models import Token
-        token = Token.objects.create(user=self.order.user)
+
+        self.user = UserFactory()
+
+        self.order = OrderFactory(user=self.user, product=[self.product])
+        token = Token.objects.create(user=self.user)
+        token.save()
+
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
     def test_order(self):
@@ -39,6 +46,9 @@ class TestOrderViewSet(APITestCase):
         )
         self.assertEqual(
             order_data[0]["product"][0]["active"], self.product.active
+        )
+        self.assertEqual(
+            order_data[0]["product"][0]["category"][0]["title"], self.category.title
         )
 
     def test_create_order(self):
