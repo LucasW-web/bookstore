@@ -47,10 +47,11 @@ RUN apt-get update \
 
 # copy project requirement files here to ensure they will be cached.
 WORKDIR $PYSETUP_PATH
-COPY pyproject.toml ./
+COPY poetry.lock pyproject.toml ./
 
 # quicker install as runtime deps are already installed
-RUN  poetry install --no-root
+RUN poetry lock --no-update && poetry install --no-root
+
 
 WORKDIR /app
 
