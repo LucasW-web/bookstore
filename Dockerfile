@@ -50,7 +50,8 @@ WORKDIR $PYSETUP_PATH
 COPY poetry.lock pyproject.toml ./
 
 # quicker install as runtime deps are already installed
-RUN  poetry install --no-root
+RUN pip install poetry && poetry export --without-hashes -f requirements.txt | pip install -r /dev/stdin
+
 
 WORKDIR /app
 
