@@ -46,16 +46,12 @@ RUN apt-get update \
     && pip install psycopg2
 
 # copy project requirement files here to ensure they will be cached.
-WORKDIR $PYSETUP_PATH
+WORKDIR /usr/src/app
 COPY poetry.lock pyproject.toml ./
 
 # quicker install as runtime deps are already installed
-RUN  poetry install --no-root
+RUN poetry config virtualenvs.create false && poetry lock && poetry install --no-root
 
-WORKDIR /app
-
-COPY . /app/
+COPY . .
 
 EXPOSE 8000
-
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
