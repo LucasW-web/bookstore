@@ -16,6 +16,7 @@ jobs:
 
       - name: Configurar arquivo de variáveis (.env.dev)
         run: |
+          cat << 'EOF' > .env.dev
           DEBUG=1
           SECRET_KEY=foo
           DJANGO_ALLOWED_HOSTS='localhost 127.0.0.1 [::1]'
@@ -25,6 +26,7 @@ jobs:
           SQL_PASSWORD=bookstore_dev
           SQL_HOST=db
           SQL_PORT=5432
+          EOF
 
       - name: Subir os containers do projeto
         run: docker compose up -d --build
