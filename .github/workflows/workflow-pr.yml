@@ -16,7 +16,6 @@ jobs:
 
       - name: Configurar arquivo de variáveis (.env.dev)
         run: |
-          cat << 'EOF' > .env.dev
           DEBUG=1
           SECRET_KEY=foo
           DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
@@ -26,16 +25,15 @@ jobs:
           SQL_PASSWORD=bookstore_dev
           SQL_HOST=db
           SQL_PORT=5432
-          EOF
 
       - name: Subir os containers do projeto
-        run: docker-compose up -d --build
+        run: docker compose up -d --build
 
       - name: Aguardar o banco inicializar
         run: sleep 10
 
       - name: Executar as Migrações do Django
-        run: docker-compose exec -T web poetry run python manage.py migrate
+        run: docker compose exec -T web poetry run python manage.py migrate
 
       - name: Executar os Testes com Pytest
-        run: docker-compose exec -T web poetry run pytest
+        run: docker compose exec -T web poetry run pytest
