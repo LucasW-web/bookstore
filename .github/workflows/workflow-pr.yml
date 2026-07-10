@@ -31,8 +31,14 @@ jobs:
       - name: Subir os containers do projeto
         run: docker compose up -d --build
 
-      - name: Aguardar o banco inicializar
-        run: sleep 10
+      - name: Aguardar o banco de dados aceitar conexões
+        run: |
+          echo "Aguardando o PostgreSQL iniciar..."
+          until docker compose exec -T db pg_isready -U bookstore_dev -d bookstore_dev_db; do
+            echo "Banco de dados ainda indisponível, aguardando mais 2 segundos..."
+            sleep 2
+          done
+          echo "PostgreSQL está pronto e aceitando conexões!"
 
       - name: Executar as Migrações do Django
         run: docker compose exec -T web poetry run python manage.py migrate
