@@ -3,15 +3,16 @@ version: '3.9'
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: poetry run python manage.py runserver 0.0.0.0:8000
     volumes:
-      - . :/usr/src/app/
+      - .:/usr/src/app/
+    environment:
+      - PYTHONPATH=/opt/pysetup/.venv/lib/python3.13/site-packages
+      - POETRY_VIRTUALENVS_CREATE=false
     ports:
       - 8000:8000
     env_file:
-      - ./env.dev
-    networks:
-      - backend
+      - ./.env.dev
     depends_on:
       - db
   db:
