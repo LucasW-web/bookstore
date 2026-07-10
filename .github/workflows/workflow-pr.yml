@@ -1,0 +1,41 @@
+name: Python Pull Request Workflow
+on:
+  push:
+    branches: [ "main", "demo-github-actions" ]
+  pull_request:
+    branches: [ "main", "demo-github-actions" ]
+
+jobs:
+  qa:
+    name: Quality check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar arquivo de variáveis (.env.dev)
+        run: |
+          cat << 'EOF' > .env.dev
+          DEBUG=1
+          SECRET_KEY=foo
+          DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+          SQL_ENGINE=django.db.backends.postgresql
+          SQL_DATABASE=bookstore_dev_db
+          SQL_USER=bookstore_dev
+          SQL_PASSWORD=bookstore_dev
+          SQL_HOST=db
+          SQL_PORT=5432
+          EOF
+
+      - name: Subir os containers do projeto
+        run: docker-compose up -d --build
+
+      - name: Aguardar o banco inicializar
+        run: sleep 10
+
+      - name: Executar as Migrações do Django
+        run: docker-compose exec -T web poetry run python manage.py migrate
+
+      - name: Executar os Testes com Pytest
+        run: docker-compose exec -T web poetry run pytest
